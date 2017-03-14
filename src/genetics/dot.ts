@@ -40,24 +40,16 @@ export class Dot extends BaseDna {
         let fitness = 0;
         pop.forEach(dna => {
             let distance = distanceBetweenPoints(this, dna);
-            if (distance <= 20) {
-                // Too close motherfucker
-            }
-            else if (distance <= 50) {
-                fitness += 100;
-            }
-            else if (distance <= 100) {
-                fitness += 300;
-            }
-            if (distance <= 200) {
-                fitness += 100;
+
+            if (distance >= 200) {
+                fitness += 4000;
             }
         });
         return fitness;
     }
 
     protected mutation_imp() {
-        this.x += (Math.random() * 300) - 600;
-        this.y += (Math.random() * 300) - 600;
+        this.x = this.x + (Math.random() * 600) - 300;
+        this.y = this.y + (Math.random() * 600) - 300;
     }
 }
