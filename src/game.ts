@@ -29,11 +29,14 @@ export class Game {
         this.dotTexture = PIXI.utils.TextureCache['./dot-texture.png'];
 
         // init population
-        this.population = new DotPopulation(POP_SIZE, 0.3, 0.3, this.renderer.width, this.renderer.height);
+        this.population = new DotPopulation(POP_SIZE, 0.03, 0.03, this.renderer.width, this.renderer.height);
         this.population.generateFirstPop();
         this.renderPopulation();
 
-        this.gameLoop();
+        setInterval(() => {
+            this.gameLoop();
+        },
+            100);
     }
 
     /** The game loop */
@@ -42,7 +45,7 @@ export class Game {
         this.population.nextGen();
         this.renderPopulation();
 
-        requestAnimationFrame(this.gameLoop.bind(this));
+        // requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /** Link dots population to the game and link the sprite */
