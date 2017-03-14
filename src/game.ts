@@ -1,5 +1,8 @@
+import { Dot } from './genetics/dot';
 import { DotPopulation } from './genetics/population';
 import 'pixi.js';
+
+const POP_SIZE = 100;
 
 export class Game {
     private stage: PIXI.Container;
@@ -20,29 +23,47 @@ export class Game {
             .load(this.setup.bind(this));
     }
 
+
+    /** Setup called when textures are loaded */
     setup() {
         this.dotTexture = PIXI.utils.TextureCache['./dot-texture.png'];
+
+        // init population
+        this.population = new DotPopulation(POP_SIZE, 0.3, 0.3, this.renderer.width, this.renderer.height);
         this.population.generateFirstPop();
-        this.renderer.render(this.stage);
-        
+        this.renderPopulation();
+
         this.gameLoop();
     }
 
+    /** The game loop */
     private gameLoop() {
-        requestAnimationFrame(this.gameLoop);
+        // Evolve the population
+        this.population.nextGen();
+        this.renderPopulation();
+
+        requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    /** Link dots population to the game and link the sprite */
+    renderPopulation() {
+        this.stage.removeChildren(0, POP_SIZE);
+        this.population.dnas.forEach(dot => {
+            this.renderDot(dot);
+        });
+
         this.renderer.render(this.stage);
     }
 
-    renderDot(x: number, y: number) {
-        let dotSprite = new PIXI.Sprite(PIXI.loader.resources["./dot-texture.png"].texture);
+    /** Add a dot to the stage */
+    renderDot(dot: Dot) {
+        let dotSprite = new PIXI.Sprite(this.dotTexture);
         dotSprite.anchor.set(0.5);
-        dotSprite.x = x;
-        dotSprite.y = y;
-        dotSprite.width = 10;
-        dotSprite.height = 10;
-
+        dotSprite.x = dot.x;
+        dotSprite.y = dot.y;
+        dotSprite.width = dot.size;
+        dotSprite.height = dot.size;
         this.stage.addChild(dotSprite);
-        this.renderer.render(this.stage);
     }
 }
 
