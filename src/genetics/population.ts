@@ -1,5 +1,6 @@
-import { Dot, BaseDna } from './dot';
-import { assign, concat } from 'lodash';
+import { BaseDna, Dots } from './dot';
+import { assign, concat, sortBy } from 'lodash';
+import { getRandomDots } from "../helpers";
 
 export abstract class BasePopulation<T extends BaseDna>
 {
@@ -13,9 +14,17 @@ export abstract class BasePopulation<T extends BaseDna>
         protected crossoverRate: number) {
     }
 
+    getBestPopulation(): { generation: number, population: T } {
+        let pop = sortBy(this.dnas, (dna) => dna.fitness)[this.dnas.length - 1];
+        return {
+            generation: this.generation,
+            population: pop
+        }
+    }
+
     nextGen() {
         for (var dna of this.dnas) {
-            dna.evaluate(this.dnas);
+            dna.evaluate();
         }
 
         this.fillBucket();
@@ -25,16 +34,16 @@ export abstract class BasePopulation<T extends BaseDna>
             let parentB = this.getRandomParentFromBucket();
             let childs = parentA.crossOver(parentB);
             childs.forEach(child => {
-                if (Math.random() <= this.mutationRate) {
-                    child.mutate();
-                }
-
+                child.mutate();
                 this.dnas.push(<T>child);
             });
         }
 
+        for (var dna of this.dnas) {
+            dna.evaluate();
+        }
+
         this.generation++;
-        console.log("generation -> " + this.generation);
     }
 
     private getRandomParentFromBucket(): T {
@@ -64,8 +73,9 @@ export abstract class BasePopulation<T extends BaseDna>
     protected abstract firstGeneration_imp(): T[];
 }
 
-export class DotPopulation extends BasePopulation<Dot>{
-    private dotSize: 3;
+export class DotPopulation extends BasePopulation<Dots>{
+    private dotSize = 5;
+    private amountDots = 100;
 
     constructor(
         protected size: number,
@@ -76,12 +86,10 @@ export class DotPopulation extends BasePopulation<Dot>{
         super(size, mutationRate, crossoverRate);
     }
 
-    protected firstGeneration_imp(): Dot[] {
-        let dnas: Dot[] = [];
+    protected firstGeneration_imp(): Dots[] {
+        let dnas: Dots[] = [];
         for (let i = 0; i < this.size; i++) {
-            let randX = Math.random() * this.width;
-            let randY = Math.random() * this.height;
-            dnas.push(new Dot(randX, randY, 5));
+            dnas.push(getRandomDots(this.width, this.height, this.dotSize, this.amountDots, this.mutationRate));
         }
 
         return dnas;

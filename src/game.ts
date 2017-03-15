@@ -1,12 +1,12 @@
 import { Dot } from './genetics/dot';
 import { DotPopulation } from './genetics/population';
 import 'pixi.js';
+import { colorToFilename } from "./helpers";
 
 const POP_SIZE = 100;
 
 export class Game {
     private stage: PIXI.Container;
-    private dotTexture: any;
     private renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 
     private population: DotPopulation;
@@ -19,24 +19,24 @@ export class Game {
 
     init() {
         PIXI.loader
-            .add("./dot-texture.png")
+            .add("./red-dot.png")
+            .add("./green-dot.png")
+            .add("./blue-dot.png")
             .load(this.setup.bind(this));
     }
 
 
     /** Setup called when textures are loaded */
     setup() {
-        this.dotTexture = PIXI.utils.TextureCache['./dot-texture.png'];
 
         // init population
-        this.population = new DotPopulation(POP_SIZE, 0.03, 0.03, this.renderer.width, this.renderer.height);
+        this.population = new DotPopulation(POP_SIZE, 0.01, 0.03, this.renderer.width, this.renderer.height);
         this.population.generateFirstPop();
         this.renderPopulation();
 
         setInterval(() => {
             this.gameLoop();
-        },
-            100);
+        }, 100);
     }
 
     /** The game loop */
@@ -51,7 +51,10 @@ export class Game {
     /** Link dots population to the game and link the sprite */
     renderPopulation() {
         this.stage.removeChildren(0, POP_SIZE);
-        this.population.dnas.forEach(dot => {
+        let bestPop = this.population.getBestPopulation();
+        console.log(bestPop);
+        console.log('fitness -> ' + bestPop.population.fitness);
+        bestPop.population.dots.forEach(dot => {
             this.renderDot(dot);
         });
 
@@ -60,7 +63,7 @@ export class Game {
 
     /** Add a dot to the stage */
     renderDot(dot: Dot) {
-        let dotSprite = new PIXI.Sprite(this.dotTexture);
+        let dotSprite = new PIXI.Sprite(PIXI.utils.TextureCache[`./${colorToFilename(dot.color)}`]);
         dotSprite.anchor.set(0.5);
         dotSprite.x = dot.x;
         dotSprite.y = dot.y;
