@@ -1,5 +1,5 @@
 import { assign } from 'lodash';
-import { distanceBetweenPoints } from "../helpers";
+import { distanceBetweenPoints, getNewPositionWithinBounds } from '../helpers';
 
 export abstract class BaseDna {
     fitness: number = 0;
@@ -51,13 +51,14 @@ export class Dots extends BaseDna {
         let fitness = 0;
         this.dots.forEach(dot => {
             let currentCol = dot.color;
-            this.dots.forEach(otherDot => {
-                if (otherDot == dot) {
-                    return;
-                }
-                fitness += this.fitnessBetweenDots(dot, otherDot);
+            fitness += dot.x;
+            // this.dots.forEach(otherDot => {
+            //     if (otherDot == dot) {
+            //         return;
+            //     }
+            //     fitness += this.fitnessBetweenDots(dot, otherDot);
 
-            });
+            // });
         });
 
         return fitness;
@@ -68,16 +69,17 @@ export class Dots extends BaseDna {
             return 0;
         }
 
+
         // pack dots with same colors
         if (dot.color == otherDot.color) {
             let distance = distanceBetweenPoints(dot, otherDot);
             if (distance <= 5) {
                 return 100;
             }
-            else if (distance <= 10) {
+            else if (distance <= 30) {
                 return 50;
             }
-            else if (distance <= 50) {
+            else if (distance <= 100) {
                 return 10;
             }
         }
@@ -88,8 +90,9 @@ export class Dots extends BaseDna {
     protected mutation_imp() {
         this.dots.forEach(dot => {
             if (Math.random() <= this.mutationRate) {
-                dot.x += Math.random() * 200 - 100;
-                dot.y += Math.random() * 200 - 100;
+                let xy = getNewPositionWithinBounds(dot);
+                dot.x = xy.x;
+                dot.y = xy.y;
             }
         });
     }

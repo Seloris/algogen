@@ -39,3 +39,26 @@ export function colorToFilename(dotColor: DotColor) {
             return "red-dot.png"
     }
 }
+
+export function getNewPositionWithinBounds(dot: Dot): { x: number, y: number } {
+    let width = 800;
+    let height = 800;
+
+    let x = dot.x + Math.random() * 200 - 100;
+    let y = dot.y + Math.random() * 200 - 100;
+    if (x < 0) {
+        x = 0
+    }
+    else if (x >= width) {
+        x = width;
+    }
+
+    if (y < 0) {
+        y = 0;
+    }
+    else if (y >= height) {
+        y = height;
+    }
+
+    return { x: x, y: y };
+}

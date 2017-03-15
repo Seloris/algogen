@@ -34,9 +34,10 @@ export class Game {
         this.population.generateFirstPop();
         this.renderPopulation();
 
-        setInterval(() => {
-            this.gameLoop();
-        }, 100);
+        this.gameLoop();
+        // setInterval(() => {
+        //     this.gameLoop();
+        // }, 100);
     }
 
     /** The game loop */
@@ -45,7 +46,7 @@ export class Game {
         this.population.nextGen();
         this.renderPopulation();
 
-        // requestAnimationFrame(this.gameLoop.bind(this));
+        requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /** Link dots population to the game and link the sprite */
