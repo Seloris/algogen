@@ -50,8 +50,7 @@ export class Dots extends BaseDna {
     protected evaluate_imp(): number {
         let fitness = 0;
         this.dots.forEach(dot => {
-            let currentCol = dot.color;
-            fitness += dot.x;
+            fitness += Math.pow(dot.x*100,50);
             // this.dots.forEach(otherDot => {
             //     if (otherDot == dot) {
             //         return;

@@ -44,8 +44,8 @@ export function getNewPositionWithinBounds(dot: Dot): { x: number, y: number } {
     let width = 800;
     let height = 800;
 
-    let x = dot.x + Math.random() * 200 - 100;
-    let y = dot.y + Math.random() * 200 - 100;
+    let x = dot.x + Math.random() * 100;// - 50;
+    let y = dot.y;// + Math.random() * 100 - 50;
     if (x < 0) {
         x = 0
     }

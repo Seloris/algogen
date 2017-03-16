@@ -3,7 +3,7 @@ import { DotPopulation } from './genetics/population';
 import 'pixi.js';
 import { colorToFilename } from "./helpers";
 
-const POP_SIZE = 100;
+const POP_SIZE = 500;
 
 export class Game {
     private stage: PIXI.Container;
@@ -30,14 +30,13 @@ export class Game {
     setup() {
 
         // init population
-        this.population = new DotPopulation(POP_SIZE, 0.01, 0.03, this.renderer.width, this.renderer.height);
+        this.population = new DotPopulation(POP_SIZE, 0.001, 0.03, this.renderer.width, this.renderer.height);
         this.population.generateFirstPop();
         this.renderPopulation();
 
-        this.gameLoop();
-        // setInterval(() => {
-        //     this.gameLoop();
-        // }, 100);
+        setInterval(() => {
+            this.gameLoop();
+        }, 100);
     }
 
     /** The game loop */
@@ -46,17 +45,22 @@ export class Game {
         this.population.nextGen();
         this.renderPopulation();
 
-        requestAnimationFrame(this.gameLoop.bind(this));
+        // requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /** Link dots population to the game and link the sprite */
     renderPopulation() {
-        this.stage.removeChildren(0, POP_SIZE);
-        let bestPop = this.population.getBestPopulation();
-        console.log(bestPop);
-        console.log('fitness -> ' + bestPop.population.fitness);
-        bestPop.population.dots.forEach(dot => {
-            this.renderDot(dot);
+        this.stage.removeChildren(0, POP_SIZE*50);
+        // let bestPop = this.population.getBestPopulation();
+        // console.log(bestPop);
+        // console.log('fitness -> ' + bestPop.population.fitness);
+
+            console.log("dna -> " + this.population.dnas.length);        
+        this.population.dnas.forEach(bestPop => {
+            console.log("pop.dots -> " + bestPop.dots.length);      
+            bestPop.dots.forEach(dot => {
+                this.renderDot(dot);
+            });
         });
 
         this.renderer.render(this.stage);

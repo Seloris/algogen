@@ -23,13 +23,9 @@ export abstract class BasePopulation<T extends BaseDna>
     }
 
     nextGen() {
-        for (var dna of this.dnas) {
-            dna.evaluate();
-        }
-
         this.fillBucket();
         this.dnas = [];
-        for (var i = 0; i < this.populationSize; i++) {
+        for (var i = 0; i < this.populationSize; i += 2) {
             let parentA = this.getRandomParentFromBucket();
             let parentB = this.getRandomParentFromBucket();
             let childs = parentA.crossOver(parentB);
@@ -52,23 +48,25 @@ export abstract class BasePopulation<T extends BaseDna>
     }
 
     private fillBucket() {
-        this.bucket = sortBy(this.dnas, (dna) => dna.fitness)
-            .slice(this.populationSize / 2, this.populationSize);
-        // let scoreArray = this.dnas.map(x => x.fitness);
-        // let total = scoreArray.reduce((prev, current) => current + prev);
-        // this.bucket = [];
-        // let normalizeScore = (score: number): number => Math.round(score / total * this.size);
-        // let currentIndex = 0;
-        // this.dnas.forEach((dna: T) => {
-        //     let currentScore = normalizeScore(dna.fitness);
-        //     for (let i = 0; i < currentScore; i++) {
-        //         this.bucket.push(dna);
-        //     }
-        // });
+        let scoreArray = this.dnas.map(x => x.fitness);
+        let total = scoreArray.reduce((prev, current) => current + prev);
+        this.bucket = [];
+        let normalizeScore = (score: number): number => Math.round(score / total * this.populationSize);
+        let currentIndex = 0;
+        this.dnas.forEach((dna: T) => {
+            let currentScore = normalizeScore(dna.fitness);
+            for (let i = 0; i < currentScore; i++) {
+                this.bucket.push(dna);
+            }
+        });
     }
 
     generateFirstPop() {
         this.dnas = this.firstGeneration_imp();
+
+        for (var dna of this.dnas) {
+            dna.evaluate();
+        }
     }
 
     /** Abstract methods */
@@ -77,7 +75,7 @@ export abstract class BasePopulation<T extends BaseDna>
 
 export class DotPopulation extends BasePopulation<Dots>{
     private dotSize = 5;
-    private amountDots = 100;
+    private amountDots = 10;
 
     constructor(
         protected size: number,
