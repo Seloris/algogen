@@ -1,4 +1,4 @@
-import { Dot, DotColor, Dots } from './genetics/dot';
+import { Square, SquareColor, Grid } from './genetics/grid';
 
 export function getRandomCoords(width: number, height: number)
     : { x: number, y: number } {
@@ -8,57 +8,29 @@ export function getRandomCoords(width: number, height: number)
     };
 }
 
-export function distanceBetweenPoints(dot1: Dot, dot2: Dot): number {
-    return Math.sqrt(Math.pow(dot2.x - dot1.x, 2) + Math.pow(dot2.y - dot1.y, 2));
+export function getRandomColor(): SquareColor {
+    let r = Math.round(Math.random() * 255);
+    let g = Math.round(Math.random() * 255);
+    let b = Math.round(Math.random() * 255);
+    return {
+        red: r,
+        green: g,
+        blue: b
+    };
 }
 
-export function getRandomDots(width: number, height: number, dotSize: number, amountDots: number, mutationRate: number): Dots {
-
-    let dotArray = [];
-    for (let i = 0; i < amountDots; i++) {
-        let randX = Math.random() * width;
-        let randY = Math.random() * height;
-        dotArray.push(new Dot(randX, randY, dotSize, getRandomColor()));
-    }
-
-    let dots = new Dots(dotArray, mutationRate);
-    return dots;
+export function rgbToHex(Color: SquareColor) {
+    return PIXI.utils.rgb2hex([Color.red / 255, Color.green / 255, Color.blue / 255]);
 }
 
-function getRandomColor(): DotColor {
-    return Math.floor(<DotColor>Math.random() * 3);
-}
-
-export function colorToFilename(dotColor: DotColor) {
-    switch (dotColor) {
-        case DotColor.Blue:
-            return "blue-dot.png";
-        case DotColor.Green:
-            return "green-dot.png";
-        case DotColor.Red:
-            return "red-dot.png"
+export function getRandomSquares(width: number, height: number, squareSize: number): Square[] {
+    let squares: Square[] = [];
+    let widthAmount = width / squareSize;
+    let heightAmount = height / squareSize;
+    for (let x = 0; x < widthAmount; x++) {
+        for (let y = 0; y < heightAmount; y++) {
+            squares.push(new Square(x * squareSize, y * squareSize, squareSize, getRandomColor()));
+        }
     }
-}
-
-export function getNewPositionWithinBounds(dot: Dot): { x: number, y: number } {
-    let width = 800;
-    let height = 800;
-
-    let x = dot.x + Math.random() * 100;// - 50;
-    let y = dot.y;// + Math.random() * 100 - 50;
-    if (x < 0) {
-        x = 0
-    }
-    else if (x >= width) {
-        x = width;
-    }
-
-    if (y < 0) {
-        y = 0;
-    }
-    else if (y >= height) {
-        y = height;
-    }
-
-    return { x: x, y: y };
+    return squares;
 }

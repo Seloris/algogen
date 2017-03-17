@@ -1,6 +1,6 @@
-import { BaseDna, Dots } from './dot';
+import { BaseDna, Grid } from './grid';
 import { assign, concat, sortBy } from 'lodash';
-import { getRandomDots } from "../helpers";
+import { getRandomSquares } from "../helpers";
 
 export abstract class BasePopulation<T extends BaseDna>
 {
@@ -48,17 +48,20 @@ export abstract class BasePopulation<T extends BaseDna>
     }
 
     private fillBucket() {
-        let scoreArray = this.dnas.map(x => x.fitness);
-        let total = scoreArray.reduce((prev, current) => current + prev);
-        this.bucket = [];
-        let normalizeScore = (score: number): number => Math.round(score / total * this.populationSize);
-        let currentIndex = 0;
-        this.dnas.forEach((dna: T) => {
-            let currentScore = normalizeScore(dna.fitness);
-            for (let i = 0; i < currentScore; i++) {
-                this.bucket.push(dna);
-            }
-        });
+        let sorted = sortBy(this.dnas, (dna => dna.fitness));
+
+        this.bucket = sorted.slice(sorted.length / 2);
+        // let scoreArray = this.dnas.map(x => x.fitness);
+        // let total = scoreArray.reduce((prev, current) => current + prev);
+        // this.bucket = [];
+        // let normalizeScore = (score: number): number => Math.round(score / total * this.populationSize);
+        // let currentIndex = 0;
+        // this.dnas.forEach((dna: T) => {
+        //     let currentScore = normalizeScore(dna.fitness);
+        //     for (let i = 0; i < currentScore; i++) {
+        //         this.bucket.push(dna);
+        //     }
+        // });
     }
 
     generateFirstPop() {
@@ -73,23 +76,22 @@ export abstract class BasePopulation<T extends BaseDna>
     protected abstract firstGeneration_imp(): T[];
 }
 
-export class DotPopulation extends BasePopulation<Dots>{
-    private dotSize = 5;
-    private amountDots = 10;
-
+export class DotPopulation extends BasePopulation<Grid>{
     constructor(
-        protected size: number,
+        protected populationSize: number,
         protected mutationRate: number,
         protected crossoverRate: number,
         private width,
-        private height) {
-        super(size, mutationRate, crossoverRate);
+        private height,
+        private squareSize) {
+        super(populationSize, mutationRate, crossoverRate, );
     }
 
-    protected firstGeneration_imp(): Dots[] {
-        let dnas: Dots[] = [];
-        for (let i = 0; i < this.size; i++) {
-            dnas.push(getRandomDots(this.width, this.height, this.dotSize, this.amountDots, this.mutationRate));
+    protected firstGeneration_imp(): Grid[] {
+        let dnas: Grid[] = [];
+        for (let i = 0; i < this.populationSize; i++) {
+            let squares = getRandomSquares(this.width, this.height, this.squareSize);
+            dnas.push(new Grid(squares, this.mutationRate));
         }
 
         return dnas;

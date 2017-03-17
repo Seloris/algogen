@@ -1,9 +1,10 @@
-import { Dot } from './genetics/dot';
+import { Square } from './genetics/grid';
 import { DotPopulation } from './genetics/population';
 import 'pixi.js';
-import { colorToFilename } from "./helpers";
+import { rgbToHex } from './helpers';
 
 const POP_SIZE = 500;
+const SQUARE_SIZE = 80;
 
 export class Game {
     private stage: PIXI.Container;
@@ -18,25 +19,11 @@ export class Game {
     }
 
     init() {
-        PIXI.loader
-            .add("./red-dot.png")
-            .add("./green-dot.png")
-            .add("./blue-dot.png")
-            .load(this.setup.bind(this));
-    }
-
-
-    /** Setup called when textures are loaded */
-    setup() {
-
-        // init population
-        this.population = new DotPopulation(POP_SIZE, 0.001, 0.03, this.renderer.width, this.renderer.height);
+        this.population = new DotPopulation(POP_SIZE, 0.1, 0.03, this.renderer.width, this.renderer.height, SQUARE_SIZE);
         this.population.generateFirstPop();
         this.renderPopulation();
 
-        setInterval(() => {
-            this.gameLoop();
-        }, 100);
+        this.gameLoop();
     }
 
     /** The game loop */
@@ -45,36 +32,30 @@ export class Game {
         this.population.nextGen();
         this.renderPopulation();
 
-        // requestAnimationFrame(this.gameLoop.bind(this));
+        requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /** Link dots population to the game and link the sprite */
     renderPopulation() {
-        this.stage.removeChildren(0, POP_SIZE*50);
-        // let bestPop = this.population.getBestPopulation();
-        // console.log(bestPop);
-        // console.log('fitness -> ' + bestPop.population.fitness);
+        this.stage.removeChildren(0, this.renderer.width * this.renderer.height);
+        let bestPop = this.population.getBestPopulation();
+        console.log(bestPop);
+        console.log('fitness -> ' + bestPop.population.fitness);
 
-            console.log("dna -> " + this.population.dnas.length);        
-        this.population.dnas.forEach(bestPop => {
-            console.log("pop.dots -> " + bestPop.dots.length);      
-            bestPop.dots.forEach(dot => {
-                this.renderDot(dot);
-            });
+        bestPop.population.squares.forEach(square => {
+            this.renderSquare(square);
         });
-
         this.renderer.render(this.stage);
     }
 
     /** Add a dot to the stage */
-    renderDot(dot: Dot) {
-        let dotSprite = new PIXI.Sprite(PIXI.utils.TextureCache[`./${colorToFilename(dot.color)}`]);
-        dotSprite.anchor.set(0.5);
-        dotSprite.x = dot.x;
-        dotSprite.y = dot.y;
-        dotSprite.width = dot.size;
-        dotSprite.height = dot.size;
-        this.stage.addChild(dotSprite);
+    renderSquare(square: Square) {
+        var graphics = new PIXI.Graphics();
+
+        graphics.beginFill(rgbToHex(square.color));
+
+        graphics.drawRect(square.x, square.y, square.size, square.size);
+        this.stage.addChild(graphics);
     }
 }
 
