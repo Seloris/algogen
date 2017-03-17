@@ -17,12 +17,13 @@ export abstract class BaseDna {
     }
 
     /** Abstract Methods*/
+    public abstract clone(): BaseDna;
     protected abstract evaluate_imp(): number;
     protected abstract mutation_imp();
     protected abstract crossOver_imp(parentB: BaseDna): BaseDna[];
 }
 
-export interface SquareColor {
+export class SquareColor {
     red: number;
     green: number;
     blue: number;
@@ -38,9 +39,19 @@ export class Grid extends BaseDna {
         super();
     }
 
+    clone() {
+        let grid = new Grid(this.cloneSquares(), this.mutationRate);
+        grid.fitness = this.fitness;
+        return grid;
+    }
+
     cloneSquares(): Square[] {
         return this.squares.map(square => {
-            return new Square(square.x, square.y, square.size, square.color);
+            return new Square(square.x, square.y, square.size, {
+                blue: square.color.blue,
+                green: square.color.green,
+                red: square.color.red
+            });
         });
     }
 
@@ -48,24 +59,29 @@ export class Grid extends BaseDna {
         var mid = Math.floor(Math.random() * this.squares.length);
         let childA = new Grid(this.cloneSquares().slice(0, mid).concat(parentB.cloneSquares().slice(mid)), this.mutationRate);
         let childB = new Grid(parentB.cloneSquares().slice(0, mid).concat(this.cloneSquares().slice(mid)), this.mutationRate);
+
+        childA.mutate();
+        childB.mutate();
         return [childA, childB];
     }
 
     protected evaluate_imp(): number {
         let cumulatedColors = 0;
         this.squares.forEach(square => {
-            cumulatedColors += Math.pow(square.color.blue + square.color.green + square.color.red, 2);
+            cumulatedColors += square.color.blue + square.color.green + square.color.red;
         });
 
-        return cumulatedColors;
+
+
+        return 1 / (1 + cumulatedColors);
     }
 
     protected mutation_imp() {
         this.squares.forEach(square => {
             if (Math.random() <= this.mutationRate) {
-                square.color.blue = Math.max(0, Math.min(255, square.color.blue + (Math.round(Math.random() * 2 - 1))));
-                square.color.green = Math.max(0, Math.min(255, square.color.green + (Math.round(Math.random() * 2 - 1))));
-                square.color.red = Math.max(0, Math.min(255, square.color.red + (Math.round(Math.random() * 2 - 1))));
+                square.color.blue = Math.max(0, Math.min(255, square.color.blue + (Math.round(Math.random() * 64 - 32))));
+                square.color.green = Math.max(0, Math.min(255, square.color.green + (Math.round(Math.random() * 64 - 32))));
+                square.color.red = Math.max(0, Math.min(255, square.color.red + (Math.round(Math.random() * 64 - 32))));
             }
         });
     }

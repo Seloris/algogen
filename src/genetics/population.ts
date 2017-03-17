@@ -6,7 +6,6 @@ export abstract class BasePopulation<T extends BaseDna>
 {
     generation: number = 0;
     dnas: T[];
-    bucket: T[];
 
     constructor(
         protected populationSize: number,
@@ -22,18 +21,32 @@ export abstract class BasePopulation<T extends BaseDna>
         }
     }
 
-    nextGen() {
-        this.fillBucket();
-        this.dnas = [];
-        for (var i = 0; i < this.populationSize; i += 2) {
-            let parentA = this.getRandomParentFromBucket();
-            let parentB = this.getRandomParentFromBucket();
-            let childs = parentA.crossOver(parentB);
-            childs.forEach(child => {
-                child.mutate();
-                this.dnas.push(<T>child);
-            });
+    generate() {
+        let bucket = this.dnas.map(dna => {
+            return <T>dna.clone();
+        });
+
+        bucket.sort((a: T, b: T) => a.fitness - b.fitness);
+        let offsprings: T[] = [];
+        for (let i = 0; i < this.populationSize; i++) {
+            let parents = this.selectParents([].concat(bucket));
+            // add crossover probability
+            let childs = parents[0].crossOver(parents[1]);
+            offsprings.push(<T>childs[0]);
         }
+
+        // Take one elit parent
+        let elitism = 1;
+        for (let i = 0; i < elitism; i++) {
+            offsprings.push(bucket[i]);
+        }
+
+        offsprings.sort((a: T, b: T) => a.fitness - b.fitness);
+        this.dnas = offsprings;
+    }
+
+    nextGen() {
+        this.generate();
 
         for (var dna of this.dnas) {
             dna.evaluate();
@@ -42,26 +55,46 @@ export abstract class BasePopulation<T extends BaseDna>
         this.generation++;
     }
 
-    private getRandomParentFromBucket(): T {
-        let rand = Math.floor(Math.random() * this.bucket.length);
-        return this.bucket[rand];
+    selectParents(pool: T[]): T[] {
+        return this.rouletteSelection(pool);
     }
 
-    private fillBucket() {
-        let sorted = sortBy(this.dnas, (dna => dna.fitness));
+    rouletteSelection(pool: T[]): T[] {
+        let mother: T = null;
+        let father: T = null;
+        var fitnessSum = 0;
 
-        this.bucket = sorted.slice(sorted.length / 2);
-        // let scoreArray = this.dnas.map(x => x.fitness);
-        // let total = scoreArray.reduce((prev, current) => current + prev);
-        // this.bucket = [];
-        // let normalizeScore = (score: number): number => Math.round(score / total * this.populationSize);
-        // let currentIndex = 0;
-        // this.dnas.forEach((dna: T) => {
-        //     let currentScore = normalizeScore(dna.fitness);
-        //     for (let i = 0; i < currentScore; i++) {
-        //         this.bucket.push(dna);
-        //     }
-        // });
+        pool.forEach(adn => {
+            fitnessSum += adn.fitness;
+        });
+
+        let i = 0;
+        let choose = Math.floor(Math.random() * fitnessSum);
+        pool.forEach(adn => {
+            if (choose <= adn.fitness) {
+                mother = adn;
+                return;
+            }
+            choose -= adn.fitness;
+            i++;
+        });
+
+        fitnessSum -= mother.fitness;
+
+        pool.splice(i, 1);
+        let test = 0;
+        i = 0;
+        choose = Math.floor(Math.random() * fitnessSum);
+        pool.forEach(adn => {
+            if (choose <= adn.fitness) {
+                father = adn;
+                return;
+            }
+            choose -= adn.fitness;
+            i++;
+        });
+
+        return [mother, father];
     }
 
     generateFirstPop() {
