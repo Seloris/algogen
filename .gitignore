@@ -1,4 +1,0 @@
-node_modules
-dist/app.*
-yarn.lock
-debug.log
