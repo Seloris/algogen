@@ -9,13 +9,13 @@ export function getRandomCoords(width: number, height: number)
 }
 
 
-export function distanceBetweenDots(dot1: Dot, dot2: Dot): number {
-    return Math.sqrt(Math.pow(dot2.x - dot1.x, 2) + Math.pow(dot2.y - dot1.y, 2));
+export function distanceBetweenPoints(x1, y1, x2, y2): number {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
 export function getNewPositionWithinBounds(dot: Dot): { x: number, y: number } {
-    let width = 800;
-    let height = 800;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
     let variation = 20;
     let x = dot.x + Math.random() * variation - variation / 2;
     let y = dot.y + Math.random() * variation - variation / 2;

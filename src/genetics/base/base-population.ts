@@ -13,11 +13,11 @@ export abstract class BasePopulation<T extends BaseDna>
         protected keepElitDna: number) {
     }
 
-    getBestPopulation(): { generation: number, population: T } {
+    getBestPopulation(): { generation: number, dots: T } {
         let pop = sortBy(this.dnas, (dna) => dna.fitness)[this.dnas.length - 1];
         return {
             generation: this.generation,
-            population: pop
+            dots: pop
         }
     }
 

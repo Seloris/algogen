@@ -2,16 +2,16 @@
 import { GridGame } from "./grid-game";
 import { DotsGame } from "./dots-game";
 
-const POP_SIZE = 200;
-const MUTATION_RATE = 0.01;
+const POP_SIZE = 100;
+const MUTATION_RATE = 1;
 const CROSSOVER_RATE = 0;
-const KEEP_ELIT_DNA = 2;
+const KEEP_ELIT_DNA = 1;
 
 // Grid
 const GRID_SQUARE_SIZE = 80;
 
 // Dots
-const AMOUNT_DOTS = 150;
+const AMOUNT_DOTS = 100;
 
 
 // let gridGame = new GridGame();

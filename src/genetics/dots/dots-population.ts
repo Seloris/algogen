@@ -15,6 +15,12 @@ export class DotsPopulation extends BasePopulation<Dots>{
         super(populationSize, mutationRate, crossoverRate, keepElitDna);
     }
 
+    public setEnemyPosition(x: number, y: number) {
+        console.log("New enemy");
+        console.log({ x: x, y: y });
+        this.dnas.forEach(dna => dna.updateEnemyPosition(x, y));
+    }
+
     protected firstGeneration_imp(): Dots[] {
         let dnas: Dots[] = [];
         for (let i = 0; i < this.populationSize; i++) {
@@ -22,10 +28,11 @@ export class DotsPopulation extends BasePopulation<Dots>{
             for (let i = 0; i < this.amountDots; i++) {
                 let randX = Math.round(Math.random() * this.width);
                 let randY = Math.round(Math.random() * this.height);
-                dotArray.push(new Dot(randX, randY, 5, getRandomDotColor()))
+                dotArray.push(new Dot(randX, randY, 5, getRandomDotColor()));
+
             }
 
-            dnas.push(new Dots(dotArray, this.mutationRate));
+            dnas.push(new Dots(dotArray, { x: window.innerWidth / 2, y: window.innerHeight }, this.mutationRate));
         }
 
         return dnas;
