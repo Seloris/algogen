@@ -1,36 +1,14 @@
-import { getRandomColor } from '../helpers';
 import { assign } from 'lodash';
+import { BaseDna } from "../base/base-dna";
 
-export abstract class BaseDna {
-    fitness: number = 0;
-
-    public crossOver(parentB: BaseDna): BaseDna[] {
-        return this.crossOver_imp(parentB);
-    }
-
-    public mutate() {
-        this.mutation_imp();
-    }
-
-    public evaluate() {
-        this.fitness = this.evaluate_imp();
-    }
-
-    /** Abstract Methods*/
-    public abstract clone(): BaseDna;
-    protected abstract evaluate_imp(): number;
-    protected abstract mutation_imp();
-    protected abstract crossOver_imp(parentB: BaseDna): BaseDna[];
-}
-
-export class SquareColor {
+export class RgbColor {
     red: number;
     green: number;
     blue: number;
 }
 
 export class Square {
-    constructor(public x: number, public y: number, public size: number, public color: SquareColor) {
+    constructor(public x: number, public y: number, public size: number, public color: RgbColor) {
     }
 }
 
@@ -39,7 +17,7 @@ export class Grid extends BaseDna {
         super();
     }
 
-    clone() {
+    clone(): Grid {
         let grid = new Grid(this.cloneSquares(), this.mutationRate);
         grid.fitness = this.fitness;
         return grid;
@@ -72,8 +50,7 @@ export class Grid extends BaseDna {
         });
 
 
-
-        return 1 / (1 + cumulatedColors);
+        return cumulatedColors != 0 ? 1 / cumulatedColors : 0;
     }
 
     protected mutation_imp() {

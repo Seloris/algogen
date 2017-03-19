@@ -1,25 +1,21 @@
-import { Square } from './genetics/grid';
-import { DotPopulation } from './genetics/population';
 import 'pixi.js';
-import { rgbToHex } from './helpers';
+import { rgbToHex } from "./helpers/color-helpers";
+import { GridPopulation } from "./genetics/grid/grid-population";
+import { Square } from "./genetics/grid/grid-dna";
 
-const POP_SIZE = 500;
-const SQUARE_SIZE = 80;
-
-export class Game {
+export class GridGame {
     private stage: PIXI.Container;
     private renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer;
 
-    private population: DotPopulation;
-
+    private population: GridPopulation;
     constructor() {
         this.renderer = PIXI.autoDetectRenderer(800, 800, { antialias: false, transparent: false, resolution: 1 });
         document.body.appendChild(this.renderer.view);
         this.stage = new PIXI.Container();
     }
 
-    init() {
-        this.population = new DotPopulation(POP_SIZE, 0.1, 0.03, this.renderer.width, this.renderer.height, SQUARE_SIZE);
+    init(popSize: number, mutationRate: number, crossoverRate: number, keepElitDna: number, squareSize: number) {
+        this.population = new GridPopulation(popSize, mutationRate, crossoverRate, keepElitDna, this.renderer.width, this.renderer.height, squareSize);
         this.population.generateFirstPop();
         this.renderPopulation();
 
