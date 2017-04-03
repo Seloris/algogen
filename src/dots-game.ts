@@ -44,7 +44,7 @@ export class DotsGame {
                 this.population.generateFirstPop();
 
                 let best = this.population.getBestPopulation();
-                this.renderDots(best.dots);
+                this.renderDots(best.pop);
                 this.renderer.render(this.stage);
                 this.gameLoop();
             });
@@ -61,7 +61,7 @@ export class DotsGame {
         // Evolve the population
         this.population.nextGen();
         let best = this.population.getBestPopulation();
-        this.updateDots(best.dots)
+        this.updateDots(best.pop)
         this.showConsoleBest(best);
 
         this.renderer.render(this.stage);

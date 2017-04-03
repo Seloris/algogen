@@ -5,10 +5,73 @@
         padding: 0;
         width: 100%;
         height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #sudoku-grid {
+        width: 600px;
+        height: 600px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .row {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .col-indicator:not(.ok) {
+        border-top: solid 5px red;
+    }
+    
+    .block-indicator.block-ok {
+        background: green;
+    }
+    
+    .block-indicator:not(.block-ok) {
+        background: orangered;
+    }
+    
+    .col-indicator.ok {
+        border-top: solid 5px green;
+    }
+    
+    .row:not(.ok) {
+        border-left: solid 5px red;
+    }
+    
+    .row.ok {
+        border-left: solid 5px green;
+    }
+    
+    .block {
+        flex: 1;
+        border: solid 1px lightslategray;
+        display: flex;
+        font-size: 22px;
+        font-family: consolas;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .block:nth-child(3),
+    .block:nth-child(6) {
+        border-right-width: 3px;
+    }
+    
+    .row:nth-child(3) .block,
+    .row:nth-child(6) .block {
+        border-bottom-width: 3px;
     }
 </style>
 
 <body>
+    <div id="sudoku-grid">
+    </div>
+
     <script src="app.bundle.js"></script>
 </body>
 
